@@ -5,7 +5,7 @@ from typing import Protocol, List, Tuple
 from dataclasses import dataclass
 
 from tictactoe.core import TicTacToeAction, TicTacToeSide, \
-    TicTacToeState, TicTacToeEnv, TicTacToeExperience
+    TicTacToeState, TicTacToeEnv, TicTacToeExperience, opponent
 
 
 class TicTacToeAgent(Protocol):
@@ -34,7 +34,7 @@ class TicTacToeSession:
     def play_game(self) -> Tuple[List[TicTacToeAction], TicTacToeSide]:
         """Let the agents play a single game of TicTacToe against each other."""
         state = self.env.reset()
-        acting_side = TicTacToeSide(random.choice([0, 1]))
+        acting_side = random.choice([TicTacToeSide.CROSS, TicTacToeSide.CIRCLE])
         acting_player = lambda: self.player_1 \
             if self.player_1.side == acting_side else self.player_2
 
@@ -56,7 +56,7 @@ class TicTacToeSession:
                 exp = TicTacToeExperience(states[-3], state, action, reward, state.is_game_over)
                 player.train(exp)
 
-            acting_side = 1 - acting_side
+            acting_side = opponent(acting_side)
 
         winner = state.last_acting_side if state.did_last_action_win else TicTacToeSide.NONE
         return actions, winner
