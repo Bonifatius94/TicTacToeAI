@@ -12,8 +12,8 @@ class TrainableTicTacToeModel:
     """Representing a trainable TicTacToe model."""
     weights: np.ndarray = None
     biases: np.ndarray = None
-    learn_rate: float = 0.02
-    reward_discount: float = 0.99
+    learn_rate: float = 0.01
+    reward_discount: float = 0.9
 
     def __post_init__(self):
         if not self.weights:
