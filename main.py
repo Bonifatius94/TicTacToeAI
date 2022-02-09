@@ -71,8 +71,7 @@ def eval_vs_good_player(num_episodes: int,
 
 
 def main():
-    # set training hyper-params
-    num_train_epochs = 2_000_000 # training takes ~40 minutes
+    num_train_epochs = 50_000
     num_eval_epochs = 1_000
 
     player_1, player_2 = run_training(num_train_epochs)
