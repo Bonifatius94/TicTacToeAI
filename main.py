@@ -1,8 +1,7 @@
-import cProfile
 from typing import Tuple
 from tqdm import tqdm
 
-from tictactoe.core import opponent, CIRCLE, CROSS, NONE, action_token
+from tictactoe.core import opponent, CIRCLE, CROSS, NONE, action_token, action_to_str, side_to_str
 from tictactoe.agent import RandomTicTacToeAgent, TrainableTicTacToeAgent
 from tictactoe.session import TicTacToeSession
 
@@ -21,8 +20,7 @@ def run_training(num_episodes: int) -> Tuple[TrainableTicTacToeAgent, TrainableT
 
 
 def eval_vs_random_player(num_episodes: int, player: TrainableTicTacToeAgent):
-    player.expl_rate = 0.00
-    rand_player = RandomTicTacToeAgent(opponent(player.side))
+    rand_player = RandomTicTacToeAgent(opponent(player.side), True)
     session = TicTacToeSession(player, rand_player)
     wins, loses, ties = 0, 0, 0
 
@@ -32,13 +30,15 @@ def eval_vs_random_player(num_episodes: int, player: TrainableTicTacToeAgent):
         actions, winner = session.play_game()
 
         if i < 10:
-            print(f'game {i}, actions {actions}, winner: {winner}')
+            actions_str = [action_to_str(a) for a in actions]
+            print(f'game {i}, actions {actions_str}, winner: {side_to_str(winner)}')
 
         ties += 1 if winner == NONE else 0
         wins += 1 if winner == player.side else 0
         loses += 1 if winner == opponent(player.side) else 0
 
     print(f'wins: {wins}, loses: {loses}, ties {ties}')
+    print(f'players selected {session.invalid_draws_count} invalid actions')
 
 
 def eval_vs_good_player(num_episodes: int,
@@ -46,7 +46,6 @@ def eval_vs_good_player(num_episodes: int,
                         player_2: TrainableTicTacToeAgent):
 
     session = TicTacToeSession(player_1, player_2)
-    session.invalid_draws_count = 0
     player_1.expl_rate = 0.01
     player_2.expl_rate = 0.01
     wins_1st_action, wins_2nd_action, ties = 0, 0, 0
@@ -57,7 +56,8 @@ def eval_vs_good_player(num_episodes: int,
         actions, winner = session.play_game()
 
         if i < 10:
-            print(f'game {i}, actions {actions}, winner: {winner}')
+            actions_str = [action_to_str(a) for a in actions]
+            print(f'game {i}, actions {actions_str}, winner: {side_to_str(winner)}')
 
         if winner == NONE:
             ties += 1
@@ -67,7 +67,6 @@ def eval_vs_good_player(num_episodes: int,
             wins_2nd_action += 1
 
     print(f'wins 1st action: {wins_1st_action}, wins 2nd action: {wins_2nd_action}, ties {ties}')
-    print(f'players selected {session.invalid_draws_count} invalid actions')
 
 
 def main():
@@ -81,8 +80,8 @@ def main():
     print('=======================================')
 
     print('evaluating players')
-    player_1.is_trainable = False
-    player_2.is_trainable = False
+    player_1.training = False
+    player_2.training = False
 
     eval_vs_random_player(num_eval_epochs, player_1)
     eval_vs_random_player(num_eval_epochs, player_2)
@@ -90,5 +89,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # cProfile.run("main()")
     main()

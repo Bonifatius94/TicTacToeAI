@@ -18,7 +18,6 @@ TicTacToeBoard = int32
 TicTacToeAction = int8
 
 
-@njit
 def side_to_str(side: TicTacToeSide) -> str:
     if side == CIRCLE:
         return 'O'
@@ -27,6 +26,12 @@ def side_to_str(side: TicTacToeSide) -> str:
     if side == NONE:
         return '_'
     raise ValueError(f'Unknown TicTacToeSide {side}!')
+
+
+@njit
+def action_to_str(action: TicTacToeAction) -> str:
+    token_str = 'O' if action_token(action) == CIRCLE else 'X'
+    return f'{token_str} -> {action_pos(action)}'
 
 
 @njit
