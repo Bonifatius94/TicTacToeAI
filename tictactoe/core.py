@@ -3,9 +3,8 @@
 from typing import List
 from dataclasses import dataclass
 
-from numba import jit, njit, int8, int32, boolean
+from numba import njit, int8, int32, boolean
 from numba.experimental import jitclass
-import numpy as np
 
 
 NONE = 0
@@ -54,7 +53,7 @@ def create_action(pos: Position, token: TicTacToeSide) -> TicTacToeAction:
     return (pos << 2) | token
 
 
-@jit(nopython=False)
+@njit
 def action_pos(action):
     return action >> 2
 
