@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from tictactoe.core import TicTacToeAction, TicTacToeSide, create_bitwise_state
+from tictactoe.core import TicTacToeAction, TicTacToeSide, \
+    create_bitwise_state, CROSS, CIRCLE
 from tictactoe.session import TicTacToeSession
 
 
@@ -36,14 +37,14 @@ class MockPlayer():
 
 
 def test_session_should_handle_win():
-    player_1 = MockPlayer(TicTacToeSide.CROSS, [2, 3, 0, 4, 1])
-    player_2 = MockPlayer(TicTacToeSide.CIRCLE, [7, 5, 8, 6, 1])
+    player_1 = MockPlayer(CROSS, [2, 3, 0, 4, 1])
+    player_2 = MockPlayer(CIRCLE, [7, 5, 8, 6, 1])
 
     session = TicTacToeSession(player_1, player_2)
     actions, winner = session.play_game()
 
     assert len(actions) in [7, 8]
-    assert winner == TicTacToeSide.CIRCLE
+    assert winner == CIRCLE
 
 
 if __name__ == '__main__':

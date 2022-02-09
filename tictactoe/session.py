@@ -4,7 +4,7 @@ import random
 from typing import Protocol, List, Tuple
 from dataclasses import dataclass
 
-from tictactoe.core import TicTacToeAction, TicTacToeSide, \
+from tictactoe.core import TicTacToeAction, TicTacToeSide, CROSS, CIRCLE, \
     TicTacToeState, TicTacToeEnv, TicTacToeExperience, opponent
 
 
@@ -34,19 +34,16 @@ class TicTacToeSession:
     def play_game(self) -> Tuple[List[TicTacToeAction], TicTacToeSide]:
         """Let the agents play a single game of TicTacToe against each other."""
         state = self.env.reset()
-        acting_side = random.choice([TicTacToeSide.CROSS, TicTacToeSide.CIRCLE])
-        acting_player = lambda: self.player_1 \
-            if self.player_1.side == acting_side else self.player_2
+        acting_side = random.choice([CROSS, CIRCLE])
 
         actions = []
         states = [state]
 
         while not state.is_game_over:
-            player = acting_player()
-
+            player = self.player_1 if self.player_1.side == acting_side else self.player_2
             action = self.select_action(player, state)
             state = self.env.apply_action(action)
-            
+
             states.append(state)
             actions.append(action)
 
@@ -58,8 +55,7 @@ class TicTacToeSession:
 
             acting_side = opponent(acting_side)
 
-        winner = state.last_acting_side if state.did_last_action_win else TicTacToeSide.NONE
-        return actions, winner
+        return actions, state.game_outcome
 
     def get_reward(self, state: TicTacToeState) -> float:
         """Evaluate the given state with a reward."""

@@ -3,8 +3,8 @@
 from dataclasses import dataclass
 import numpy as np
 
-from tictactoe.core import TicTacToeAction, TicTacToeSide, \
-    TicTacToeState, TicTacToeExperience, invert_state
+from tictactoe.core import TicTacToeAction, TicTacToeSide, CROSS, \
+    TicTacToeState, TicTacToeExperience, create_action, invert_state, action_pos
 
 
 @dataclass
@@ -24,7 +24,7 @@ class TrainableTicTacToeModel:
     def train(self, exp: TicTacToeExperience):
         """Update the model weights training with the given experience."""
         inputs = np.array(exp.state_before.board) - 1
-        pred = self.predict(exp.state_before)[0][exp.action.pos]
+        pred = self.predict(exp.state_before)[0][action_pos(exp.action)]
         can_eval_est_1 = exp.state_after and not exp.state_after.is_game_over
         label = self.reward_discount * np.max(self.predict(exp.state_after)) \
                     if can_eval_est_1 else exp.reward
@@ -32,7 +32,7 @@ class TrainableTicTacToeModel:
         d_w = -2.0 * (label - pred) * inputs
         d_b = -2.0 * (label - pred)
         d_w, d_b = np.clip(d_w, -1, 1), np.clip(d_b, -1, 1)
-        self.weights[:, exp.action.pos] -= d_w * self.learn_rate
+        self.weights[:, action_pos(exp.action)] -= d_w * self.learn_rate
         self.biases -= d_b * self.learn_rate
 
     def predict(self, state: TicTacToeState) -> np.ndarray:
@@ -53,7 +53,7 @@ class TrainableTicTacToeAgent:
         """Choose the best action"""
         pos: int = np.argmax(self.model.predict(self._norm_state(state)))
         pos = pos if np.random.uniform() > self.expl_rate else np.random.choice(range(9))
-        return TicTacToeAction(pos, self.side)
+        return create_action(pos, self.side)
 
     def train(self, exp: TicTacToeExperience):
         """Update the model weights training with the given experience."""
@@ -62,7 +62,7 @@ class TrainableTicTacToeAgent:
         self.model.train(exp)
 
     def _norm_state(self, state: TicTacToeState) -> TicTacToeState:
-        return invert_state(state) if self.side == TicTacToeSide.CROSS else state
+        return invert_state(state) if self.side == CROSS else state
 
 
 @dataclass
@@ -73,7 +73,7 @@ class RandomTicTacToeAgent:
 
     def choose_action(self, _: TicTacToeState) -> TicTacToeAction:
         """Choose the best action"""
-        return TicTacToeAction(np.random.choice(range(9)), self.side)
+        return create_action(np.random.choice(range(9)), self.side)
 
     def train(self, _: TicTacToeExperience):
         """Nothing to do here. Agent is not trainable"""
