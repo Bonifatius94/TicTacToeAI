@@ -46,13 +46,14 @@ class TrainableTicTacToeAgent:
     """Representing a trainable TicTacToe agent."""
     side: TicTacToeSide
     model: TrainableTicTacToeModel = TrainableTicTacToeModel()
-    is_trainable: bool = True
+    training: bool = True
     expl_rate: float = 0.1
 
     def choose_action(self, state: TicTacToeState) -> TicTacToeAction:
         """Choose the best action"""
         pos: int = np.argmax(self.model.predict(self._norm_state(state)))
-        pos = pos if np.random.uniform() > self.expl_rate else np.random.choice(range(9))
+        exploit = not self.training or np.random.uniform() > self.expl_rate
+        pos = pos if exploit else np.random.choice(range(9))
         return create_action(pos, self.side)
 
     def train(self, exp: TicTacToeExperience):
@@ -69,7 +70,7 @@ class TrainableTicTacToeAgent:
 class RandomTicTacToeAgent:
     """Representing a randomly acting TicTacToe agent."""
     side: TicTacToeSide
-    is_trainable: bool = False
+    training: bool = False
 
     def choose_action(self, _: TicTacToeState) -> TicTacToeAction:
         """Choose the best action"""

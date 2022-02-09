@@ -10,7 +10,7 @@ from tictactoe.core import TicTacToeAction, TicTacToeSide, CROSS, CIRCLE, \
 
 class TicTacToeAgent(Protocol):
     """Representing a blueprint of a TicTacToe agent."""
-    is_trainable: bool
+    training: bool
     side: TicTacToeSide
 
     def choose_action(self, state: TicTacToeState) -> TicTacToeAction:
@@ -47,7 +47,7 @@ class TicTacToeSession:
             states.append(state)
             actions.append(action)
 
-            if len(states) > 2 and player.is_trainable:
+            if len(states) > 2 and player.training:
                 reward = self.get_reward(state)
                 # TODO: make the 8th action also terminal
                 exp = TicTacToeExperience(states[-3], state, action, reward, state.is_game_over)
@@ -68,9 +68,10 @@ class TicTacToeSession:
         """Let the player choose a valid action."""
         action = player.choose_action(state)
         while not self.env.can_apply_action(action):
-            self.invalid_draws_count += 1
-            if player.is_trainable:
+            if player.training:
                 penalty_exp = TicTacToeExperience(state, None, action, -1.0, True)
                 player.train(penalty_exp)
+            else:
+                self.invalid_draws_count += 1
             action = player.choose_action(state)
         return action
