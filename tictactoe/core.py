@@ -7,15 +7,15 @@ from numba import njit, int8, int32, boolean
 from numba.experimental import jitclass
 
 
-NONE = 0
-CIRCLE = 1
-CROSS = 2
-
-
 TicTacToeSide = int8
 Position = int8
 TicTacToeBoard = int32
 TicTacToeAction = int8
+
+
+NONE: TicTacToeSide = 0
+CIRCLE: TicTacToeSide = 1
+CROSS: TicTacToeSide = 2
 
 
 def side_to_str(side: TicTacToeSide) -> str:
