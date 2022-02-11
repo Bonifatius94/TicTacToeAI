@@ -50,7 +50,7 @@ class TicTacToeSession:
             if len(states) > 2 and player.training:
                 reward = self.get_reward(state)
                 # TODO: make the 8th action also terminal
-                exp = TicTacToeExperience(states[-3], state, action, reward, state.is_game_over)
+                exp = TicTacToeExperience(states[-3], state, actions[-2], reward, state.is_game_over)
                 player.train(exp)
 
             acting_side = opponent(acting_side)
